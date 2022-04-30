@@ -3,16 +3,20 @@
 
 #include "camera.h"
 #include "texture.h"
+#include "meteor.h"
 
 #include <obj/model.h>
 
-#define SIZE 10
+#define SIZE 2
+#define T_SIZE 2
+#define N_METEOR 50
 
 typedef struct Scene
 {
     Model objects[SIZE];
     Material material;
-    GLuint texture_id;
+    Meteors meteors[N_METEOR];
+    GLuint texture_id[T_SIZE];
 } Scene;
 
 /**

@@ -2,18 +2,18 @@
 
 #include <obj/load.h>
 #include <obj/draw.h>
+#include "meteor.h"
 
 #define Angels 90
 
 float rotate = 0.00;
-float m_rotate = 0.00;
 
 void init_scene(Scene* scene)
 {
-    load_model(&(scene->objects[0]), "assets/models/meteor.obj");
-    scene->texture_id = load_texture("assets/textures/meteor.jpg");
+    load_model(&(scene->objects[0]), "assets/models/spaceship.obj");
+    scene->texture_id[0] = load_texture("assets/textures/spaceship.jpg");
 
-    glBindTexture(GL_TEXTURE_2D, scene->texture_id);
+    glBindTexture(GL_TEXTURE_2D, scene->texture_id[0]);
 
     scene->material.ambient.red = 1.0;
     scene->material.ambient.green = 1.0;
@@ -89,9 +89,8 @@ void render_scene(const Scene* scene)
        glTranslatef(0,0,2.60);
        draw_model(&(scene->objects[0]));
     glPopMatrix();
-
-    if((m_rotate + 0.05) == 360)
-        m_rotate = 0.00;
-    else    
-        m_rotate = m_rotate + 0.05;
+    glPushMatrix();
+        glTranslatef(scene->meteors[0].position.x,scene->meteors[0].position.y,scene->meteors[0].position.z);
+        draw_model(&(scene->objects[1]));
+    glPopMatrix();
 }
