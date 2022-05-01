@@ -2,6 +2,7 @@
 
 #include <obj/load.h>
 #include <obj/draw.h>
+#include <time.h>
 #include "meteor.h"
 
 #define Angels 90
@@ -13,7 +14,7 @@ void init_scene(Scene* scene)
     load_model(&(scene->objects[0]), "assets/models/spaceship.obj");
     scene->texture_id[0] = load_texture("assets/textures/spaceship.jpg");
 
-    glBindTexture(GL_TEXTURE_2D, scene->texture_id[0]);
+    init_meteors(scene);
 
     scene->material.ambient.red = 1.0;
     scene->material.ambient.green = 1.0;
@@ -28,6 +29,34 @@ void init_scene(Scene* scene)
     scene->material.specular.blue = 0.0;
 
     scene->material.shininess = 1.4;
+}
+
+void init_meteors(Scene* scene){
+    int direction, coord;
+    srand(time(0));
+
+    load_model(&(scene->objects[1]), "assets/models/meteor.obj");
+    scene->texture_id[1] = load_texture("assets/textures/meteor.jpg");
+
+    for(int i = 0;i<10;i++){
+        coord = (rand() % 90) + 20;
+        scene->meteors[i].position.x = coord;
+        coord = (rand() % 70) + 20;
+        scene->meteors[i].position.y = coord;
+        coord = (rand() % 90) + 20;
+        scene->meteors[i].position.z = coord;
+        scene->meteors[i].angle = 0.00;
+        scene->meteors[i].speed = 0.50;
+    }
+}
+
+void update_rotation(Scene* scene){
+    for(int i = 0;i<10;i++)
+    {
+        scene->meteors[i].rotation.x = 1.00;
+        scene->meteors[i].rotation.y = 0.00;
+        scene->meteors[i].rotation.z = 1.00;
+    }
 }
 
 void set_lighting()
@@ -78,6 +107,11 @@ void update_scene(Scene* scene,float ang)
         rotate = 0;
     else
         rotate = rotate + ang;
+
+    for(int i = 0;i<10;i++){
+        if((scene->meteors[i].angle + 0.25) <= 360.00) scene->meteors[i].angle += 0.25;
+        else scene->meteors[i].angle = 0.00;
+    }
 }
 void render_scene(const Scene* scene)
 {
@@ -87,10 +121,14 @@ void render_scene(const Scene* scene)
        glRotatef(Angels+rotate,1.0f,0.0f,0.0f);
        glRotatef(Angels,0.0f,1.0f,0.0f);
        glTranslatef(0,0,2.60);
+       glBindTexture(GL_TEXTURE_2D, scene->texture_id[0]);
        draw_model(&(scene->objects[0]));
     glPopMatrix();
-    glPushMatrix();
-        glTranslatef(scene->meteors[0].position.x,scene->meteors[0].position.y,scene->meteors[0].position.z);
-        draw_model(&(scene->objects[1]));
-    glPopMatrix();
+    for(int i = 0; i < 10;i++){
+        glPushMatrix();        
+            glBindTexture(GL_TEXTURE_2D, scene->texture_id[1]);
+            glTranslatef(scene->meteors[i].position.x,scene->meteors[i].position.y,scene->meteors[i].position.z);
+            draw_model(&(scene->objects[1]));
+        glPopMatrix();
+    }
 }

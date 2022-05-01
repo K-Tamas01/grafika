@@ -122,10 +122,10 @@ void handle_app_events(App* app)
                 set_camera_speed(&(app->camera), -1);
                 break;
             case SDL_SCANCODE_A:
-                ang = -0.25;
+                ang = -0.50;
                 break;
             case SDL_SCANCODE_D:
-                ang = 0.25;
+                ang = 0.50;
                 break;
             default:
                 break;

@@ -9,7 +9,7 @@
 
 #define SIZE 2
 #define T_SIZE 2
-#define N_METEOR 50
+#define N_METEOR 10
 
 typedef struct Scene
 {
@@ -43,5 +43,9 @@ void update_scene(Scene* scene ,float ang);
  * Render the scene objects.
  */
 void render_scene(const Scene* scene);
+
+void init_meteors(Scene* scene);
+
+void update_rotation(Scene* scene);
 
 #endif /* SCENE_H */
