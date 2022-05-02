@@ -3,6 +3,7 @@
 #include <SDL2/SDL_image.h>
 
 float ang = 0;
+float spaceship_height = 0, side_rl = 0;
 
 void init_app(App* app, int width, int height)
 {
@@ -115,11 +116,23 @@ void handle_app_events(App* app)
             case SDL_SCANCODE_ESCAPE:
                 app->is_running = false;
                 break;
-            case SDL_SCANCODE_W:
+            case SDL_SCANCODE_I:
                 set_camera_speed(&(app->camera), 1);
                 break;
-            case SDL_SCANCODE_S:
+            case SDL_SCANCODE_K:
                 set_camera_speed(&(app->camera), -1);
+                break;
+            case SDL_SCANCODE_Q:
+                 side_rl = 0.05;
+                break;
+            case SDL_SCANCODE_E:
+                 side_rl = -0.05;
+                break;
+            case SDL_SCANCODE_W:
+                spaceship_height = 0.05; 
+                break;
+            case SDL_SCANCODE_S:
+                spaceship_height = -0.05; 
                 break;
             case SDL_SCANCODE_A:
                 ang = -0.50;
@@ -133,13 +146,21 @@ void handle_app_events(App* app)
             break;
         case SDL_KEYUP:
             switch (event.key.keysym.scancode) {
-            case SDL_SCANCODE_W:
-            case SDL_SCANCODE_S:
+            case SDL_SCANCODE_I:
+            case SDL_SCANCODE_K:
                 set_camera_speed(&(app->camera), 0);
                 break;
             case SDL_SCANCODE_A:
             case SDL_SCANCODE_D:
                 ang = 0;
+                break;
+            case SDL_SCANCODE_W:
+            case SDL_SCANCODE_S:
+                spaceship_height = 0;
+                break;
+            case SDL_SCANCODE_Q:
+            case SDL_SCANCODE_E:
+                side_rl = 0;
                 break;
             default:
                 break;
@@ -179,7 +200,7 @@ void update_app(App* app)
     app->uptime = current_time;
 
     update_camera(&(app->camera), elapsed_time);
-    update_scene(&(app->scene), ang);
+    update_scene(&(app->scene), ang, spaceship_height,side_rl);
 }
 
 void render_app(App* app)

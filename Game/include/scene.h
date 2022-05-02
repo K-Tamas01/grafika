@@ -37,7 +37,7 @@ void set_material(const Material* material);
 /**
  * Update the scene.
  */
-void update_scene(Scene* scene ,float ang);
+void update_scene(Scene* scene ,float ang,float spaceship_height,float side_rl);
 
 /**
  * Render the scene objects.

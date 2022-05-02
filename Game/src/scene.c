@@ -8,6 +8,7 @@
 #define Angels 90
 
 float rotate = 0.00;
+float  h_space = 0, r_side_l = 0;
 
 void init_scene(Scene* scene)
 {
@@ -32,7 +33,7 @@ void init_scene(Scene* scene)
 }
 
 void init_meteors(Scene* scene){
-    int direction, coord;
+    int coord;
     srand(time(0));
 
     load_model(&(scene->objects[1]), "assets/models/meteor.obj");
@@ -46,16 +47,6 @@ void init_meteors(Scene* scene){
         coord = (rand() % 90) + 20;
         scene->meteors[i].position.z = coord;
         scene->meteors[i].angle = 0.00;
-        scene->meteors[i].speed = 0.50;
-    }
-}
-
-void update_rotation(Scene* scene){
-    for(int i = 0;i<10;i++)
-    {
-        scene->meteors[i].rotation.x = 1.00;
-        scene->meteors[i].rotation.y = 0.00;
-        scene->meteors[i].rotation.z = 1.00;
     }
 }
 
@@ -99,19 +90,24 @@ void set_material(const Material* material)
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, &(material->shininess));
 }
 
-void update_scene(Scene* scene,float ang)
+void update_scene(Scene* scene,float ang,float spaceship_height,float side_rl)
 {   
-    if((rotate + ang) >= 360.00)
-        rotate = 0;
-    else if((rotate - ang) <= -360.00)
-        rotate = 0;
+    if((rotate + ang) >= 45.00)
+        rotate = 45;
+    else if((rotate - ang) <= -45.00)
+        rotate = 45;
     else
         rotate = rotate + ang;
 
-    for(int i = 0;i<10;i++){
-        if((scene->meteors[i].angle + 0.25) <= 360.00) scene->meteors[i].angle += 0.25;
+    if((h_space - spaceship_height) < 10) h_space = h_space + spaceship_height;
+    if((h_space + spaceship_height) > 10) h_space = h_space - spaceship_height;
+
+    if((r_side_l - side_rl) < 10) r_side_l = r_side_l + side_rl;
+    if((r_side_l + side_rl) > 10) r_side_l = r_side_l - side_rl;
+
+    for(int i = 0;i<10;i++)
+        if((scene->meteors[i].angle + 0.15) < 360.00) scene->meteors[i].angle += 0.05;
         else scene->meteors[i].angle = 0.00;
-    }
 }
 void render_scene(const Scene* scene)
 {
@@ -120,13 +116,16 @@ void render_scene(const Scene* scene)
     glPushMatrix();
        glRotatef(Angels+rotate,1.0f,0.0f,0.0f);
        glRotatef(Angels,0.0f,1.0f,0.0f);
+       glTranslatef(0,h_space,0);
+       glTranslatef(r_side_l,0,0);
        glTranslatef(0,0,2.60);
        glBindTexture(GL_TEXTURE_2D, scene->texture_id[0]);
        draw_model(&(scene->objects[0]));
-    glPopMatrix();
-    for(int i = 0; i < 10;i++){
-        glPushMatrix();        
+    glPopMatrix();   
+    for(int i = 0; i < 10;i++){    
+        glPushMatrix(); 
             glBindTexture(GL_TEXTURE_2D, scene->texture_id[1]);
+            glRotatef(scene->meteors[i].angle,0.0f,1.0f,0.0f);
             glTranslatef(scene->meteors[i].position.x,scene->meteors[i].position.y,scene->meteors[i].position.z);
             draw_model(&(scene->objects[1]));
         glPopMatrix();
