@@ -9,6 +9,7 @@
 
 float rotate = 0.00;
 float  h_space = 0, r_side_l = 0;
+float speed = 1;					// majd spaceship recordba elhelyezni! vec3-ba
 
 void init_scene(Scene* scene)
 {
@@ -92,12 +93,14 @@ void set_material(const Material* material)
 
 void update_scene(Scene* scene,float ang,float spaceship_height,float side_rl)
 {   
-    if((rotate + ang) >= 45.00)
-        rotate = 45;
-    else if((rotate - ang) <= -45.00)
-        rotate = 45;
-    else
-        rotate = rotate + ang;
+    if((rotate + ang) <= -45)
+	rotate = -45;
+    if(((rotate + ang) >= 45))
+	rotate = 45;    
+
+    if(((rotate + ang) >= -45) && ((rotate + ang) <= 45))
+	rotate += ang;
+   
 
     if((h_space - spaceship_height) < 10) h_space = h_space + spaceship_height;
     if((h_space + spaceship_height) > 10) h_space = h_space - spaceship_height;
@@ -106,8 +109,15 @@ void update_scene(Scene* scene,float ang,float spaceship_height,float side_rl)
     if((r_side_l + side_rl) > 10) r_side_l = r_side_l - side_rl;
 
     for(int i = 0;i<10;i++)
-        if((scene->meteors[i].angle + 0.15) < 360.00) scene->meteors[i].angle += 0.05;
+        if((scene->meteors[i].angle + 0.05) < 360.00) scene->meteors[i].angle += 0.05;
         else scene->meteors[i].angle = 0.00;
+
+    speed += 0.35;								//spaceship recordba beírni
+
+    for(int i = 0;i<10;i++){
+	scene->meteors[i].position.y -= 1;
+	scene->meteors[i].position.z -= 1;
+    }
 }
 void render_scene(const Scene* scene)
 {
@@ -118,14 +128,14 @@ void render_scene(const Scene* scene)
        glRotatef(Angels,0.0f,1.0f,0.0f);
        glTranslatef(0,h_space,0);
        glTranslatef(r_side_l,0,0);
-       glTranslatef(0,0,2.60);
+       glTranslatef(0,0,speed);
        glBindTexture(GL_TEXTURE_2D, scene->texture_id[0]);
        draw_model(&(scene->objects[0]));
     glPopMatrix();   
     for(int i = 0; i < 10;i++){    
         glPushMatrix(); 
             glBindTexture(GL_TEXTURE_2D, scene->texture_id[1]);
-            glRotatef(scene->meteors[i].angle,0.0f,1.0f,0.0f);
+            glRotatef(scene->meteors[i].angle,1.0f,1.0f,0.0f);
             glTranslatef(scene->meteors[i].position.x,scene->meteors[i].position.y,scene->meteors[i].position.z);
             draw_model(&(scene->objects[1]));
         glPopMatrix();

@@ -135,10 +135,10 @@ void handle_app_events(App* app)
                 spaceship_height = -0.05; 
                 break;
             case SDL_SCANCODE_A:
-                ang = -0.50;
+                ang = -1;
                 break;
             case SDL_SCANCODE_D:
-                ang = 0.50;
+                ang = 1;
                 break;
             default:
                 break;
