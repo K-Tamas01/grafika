@@ -16,7 +16,7 @@ void init_scene(Scene* scene)
     init_spaceship(scene);
     init_meteors(scene);
 
-    scene->texture_id[2] = load_texture("assets/textures/spaceship.jpg");
+    scene->texture_id[2] = load_texture("assets/textures/help.jpg");
 
     scene->is_visible = false;
 
@@ -90,7 +90,7 @@ void set_lighting(Scene* scene,float speed)
         scene->light.specular_light[i] += speed;
     }
 
-     glLightfv(GL_LIGHT0, GL_AMBIENT, scene->light.ambient_light);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, scene->light.ambient_light);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, scene->light.diffuse_light);
     glLightfv(GL_LIGHT0, GL_SPECULAR, scene->light.specular_light);
     glLightfv(GL_LIGHT0, GL_POSITION, scene->light.position);
@@ -126,12 +126,12 @@ void set_material(const Material* material)
 void update_scene(Scene* scene,float ang,float spaceship_height,float side_rl)
 {   
     if((scene->spaceship.rotate + ang) <= -45)
-	scene->spaceship.rotate = -45;
+	    scene->spaceship.rotate = -45;
     if(((scene->spaceship.rotate + ang) >= 45))
-	scene->spaceship.rotate = 45;    
+	    scene->spaceship.rotate = 45;    
 
     if(((scene->spaceship.rotate + ang) >= -45) && ((scene->spaceship.rotate + ang) <= 45))
-	scene->spaceship.rotate += ang;
+	    scene->spaceship.rotate += ang;
    
 
     if((h_space - spaceship_height) < 10) h_space = h_space + spaceship_height;
@@ -151,8 +151,8 @@ void update_scene(Scene* scene,float ang,float spaceship_height,float side_rl)
     scene->spaceship.rotate += ang;
 
     for(int i = 0;i<50;i++){
-	scene->meteors[i].position.y -= 0.15;
-	scene->meteors[i].position.z -= 0.15;
+	    scene->meteors[i].position.y -= 0.15;
+	    scene->meteors[i].position.z -= 0.15;
     }
 }
 void render_scene(const Scene* scene,float speed)

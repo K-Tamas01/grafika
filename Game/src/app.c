@@ -122,15 +122,15 @@ void handle_app_events(App* app)
                 if(follow == true) follow = false;
                 else follow = true;
                 break;
+            case SDL_SCANCODE_N:
+                speed = -0.05;
+                break;
+            case SDL_SCANCODE_B:
+                speed = 0.05;
+                break;
             case SDL_SCANCODE_I:
                 if(follow == false)
                     set_camera_speed(&(app->camera), 1);
-                break;
-             case SDL_SCANCODE_B:
-                speed = -0.05;
-                break;
-             case SDL_SCANCODE_N:
-                speed = 0.05;
                 break;
             case SDL_SCANCODE_K:
                 if(follow == false)
