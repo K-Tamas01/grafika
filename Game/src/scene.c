@@ -8,12 +8,19 @@
 
 #define Angels 90
 
-float  h_space = 0, r_side_l = 0;				
+float  h_space = 0, r_side_l = 0;		
 
 void init_scene(Scene* scene)
 {
+
+    init_light(scene);
+
     init_spaceship(scene);
     init_meteors(scene);
+
+    scene->texture_id[2] = load_texture("assets/textures/spaceship.jpg");
+
+    scene->is_visible = false;
 
     scene->material.ambient.red = 1.0;
     scene->material.ambient.green = 1.0;
@@ -39,7 +46,7 @@ void init_spaceship(Scene* scene){
     scene->spaceship.position.y = 0;
     scene->spaceship.position.z = 1.25;
     scene->spaceship.rotate = 0.00;
-    scene->spaceship.speed = 0.35;
+    scene->spaceship.speed = 0.0;
 }
 
 void init_meteors(Scene* scene){
@@ -60,17 +67,35 @@ void init_meteors(Scene* scene){
     }
 }
 
-void set_lighting()
-{
-    float ambient_light[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    float diffuse_light[] = { 1.0f, 1.0f, 1.0, 1.0f };
-    float specular_light[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-    float position[] = { 0.0f, 0.0f, 10.0f, 1.0f };
+void init_light(Scene* scene){
+    for(int i = 0;i<4;i++){
+        scene->light.ambient_light[i] = 1.0f;
+        scene->light.diffuse_light[i] = 1.0f;
+        scene->light.specular_light[i] = 1.0f;
+    }
+    scene->light.position[0] = 0.0f;
+    scene->light.position[1] = 0.0f;
+    scene->light.position[2] = 10.0f;
+    scene->light.position[3] = 1.0f;
 
-    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_light);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse_light);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, specular_light);
-    glLightfv(GL_LIGHT0, GL_POSITION, position);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, scene->light.ambient_light);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, scene->light.diffuse_light);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, scene->light.specular_light);
+    glLightfv(GL_LIGHT0, GL_POSITION, scene->light.position);
+}
+
+void set_lighting(Scene* scene,float speed)
+{
+    for(int i = 0;i<4;i++){
+        scene->light.ambient_light[i] += speed;
+        scene->light.diffuse_light[i] += speed;
+        scene->light.specular_light[i] += speed;
+    }
+
+     glLightfv(GL_LIGHT0, GL_AMBIENT, scene->light.ambient_light);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, scene->light.diffuse_light);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, scene->light.specular_light);
+    glLightfv(GL_LIGHT0, GL_POSITION, scene->light.position);
 }
 
 void set_material(const Material* material)
@@ -102,7 +127,6 @@ void set_material(const Material* material)
 
 void update_scene(Scene* scene,float ang,float spaceship_height,float side_rl)
 {   
-
     if((scene->spaceship.rotate + ang) <= -45)
 	scene->spaceship.rotate = -45;
     if(((scene->spaceship.rotate + ang) >= 45))
@@ -133,10 +157,10 @@ void update_scene(Scene* scene,float ang,float spaceship_height,float side_rl)
 	scene->meteors[i].position.z -= 1;
     }
 }
-void render_scene(const Scene* scene)
+void render_scene(const Scene* scene,float speed)
 {
     set_material(&(scene->material));
-    set_lighting();
+    set_lighting(scene,speed);
     glPushMatrix();
        glRotatef(Angels+scene->spaceship.rotate,1.0f,0.0f,0.0f);
        glRotatef(Angels,0.0f,1.0f,0.0f);
@@ -152,4 +176,42 @@ void render_scene(const Scene* scene)
             draw_model(&(scene->objects[1]));
         glPopMatrix();
     }
+    if(scene->is_visible){
+        help(scene->texture_id[2]);
+    }
+
+}
+
+void help(const GLuint texture){
+
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_COLOR_MATERIAL);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    glColor4f(0.75f, 0.75f, 0.75f, 1.0f);
+
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glBegin(GL_QUADS);
+        glTexCoord2f(0, 0);
+        glVertex3d(-2, 1.5, -3);
+
+        glTexCoord2f(1, 0);
+        glVertex3d(2, 1.5, -3);
+
+        glTexCoord2f(1, 1);
+        glVertex3d(2, -1.5, -3);
+        
+        glTexCoord2f(0, 1);
+        glVertex3d(-2, -1.5, -3);
+    glEnd();
+
+    glDisable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 }

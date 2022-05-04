@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 float ang = 0;
-float spaceship_height = 0, side_rl = 0;
+float spaceship_height = 0, side_rl = 0,speed = 0;
 bool follow = true;
 
 void init_app(App* app, int width, int height)
@@ -98,7 +98,7 @@ void reshape(GLsizei width, GLsizei height)
     glFrustum(
         -.08, .08,
         -.06, .06,
-        .1, 1000
+        .1, 100
     );
 }
 
@@ -125,6 +125,12 @@ void handle_app_events(App* app)
             case SDL_SCANCODE_I:
                 if(follow == false)
                     set_camera_speed(&(app->camera), 1);
+                break;
+             case SDL_SCANCODE_B:
+                speed = -0.05;
+                break;
+             case SDL_SCANCODE_N:
+                speed = 0.05;
                 break;
             case SDL_SCANCODE_K:
                 if(follow == false)
@@ -156,6 +162,10 @@ void handle_app_events(App* app)
             case SDL_SCANCODE_D:
                 ang = 1;
                 break;
+            case SDL_SCANCODE_F1:
+                if ((app->scene.is_visible == false)) app->scene.is_visible = true;
+                else app->scene.is_visible = false;
+                break;
             default:
                 break;
             }
@@ -173,6 +183,10 @@ void handle_app_events(App* app)
             case SDL_SCANCODE_A:
             case SDL_SCANCODE_D:
                 ang = 0;
+                break;
+            case SDL_SCANCODE_B:
+            case SDL_SCANCODE_N:
+                speed = 0;
                 break;
             case SDL_SCANCODE_W:
             case SDL_SCANCODE_S:
@@ -230,7 +244,7 @@ void render_app(App* app)
 
     glPushMatrix();
     set_view(&(app->camera));
-    render_scene(&(app->scene));
+    render_scene(&(app->scene),speed);
     glPopMatrix();
 
     if (app->camera.is_preview_visible) {
