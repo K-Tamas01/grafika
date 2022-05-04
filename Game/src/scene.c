@@ -6,8 +6,6 @@
 #include "meteor.h"
 #include "spaceship.h"
 
-#define Angels 90
-
 float  h_space = 0, r_side_l = 0;		
 
 void init_scene(Scene* scene)
@@ -46,7 +44,7 @@ void init_spaceship(Scene* scene){
     scene->spaceship.position.y = 0;
     scene->spaceship.position.z = 1.25;
     scene->spaceship.rotate = 0.00;
-    scene->spaceship.speed = 0.0;
+    scene->spaceship.speed = 0.15;
 }
 
 void init_meteors(Scene* scene){
@@ -56,7 +54,7 @@ void init_meteors(Scene* scene){
     load_model(&(scene->objects[1]), "assets/models/meteor.obj");
     scene->texture_id[1] = load_texture("assets/textures/meteor.jpg");
 
-    for(int i = 0;i<10;i++){
+    for(int i = 0;i<50;i++){
         coord = (rand() % 90) + 20;
         scene->meteors[i].position.x = coord;
         coord = (rand() % 70) + 20;
@@ -142,19 +140,19 @@ void update_scene(Scene* scene,float ang,float spaceship_height,float side_rl)
     if((r_side_l - side_rl) < 10) r_side_l = r_side_l + side_rl;
     if((r_side_l + side_rl) > 10) r_side_l = r_side_l - side_rl;
 
-    for(int i = 0;i<10;i++)
-        if((scene->meteors[i].angle + 0.05) < 360.00) scene->meteors[i].angle += 0.05;
+    for(int i = 0;i<50;i++)
+        if((scene->meteors[i].angle + 2.5) < 360.00) scene->meteors[i].angle += 2.5;
         else scene->meteors[i].angle = 0.00;
 
-    scene->spaceship.position.x = r_side_l;
-    scene->spaceship.position.y = h_space;
-    scene->spaceship.position.z += scene->spaceship.speed;
+    scene->spaceship.position.x += scene->spaceship.speed;
+    scene->spaceship.position.y = r_side_l;
+    scene->spaceship.position.z = h_space;
 
     scene->spaceship.rotate += ang;
 
-    for(int i = 0;i<10;i++){
-	scene->meteors[i].position.y -= 1;
-	scene->meteors[i].position.z -= 1;
+    for(int i = 0;i<50;i++){
+	scene->meteors[i].position.y -= 0.15;
+	scene->meteors[i].position.z -= 0.15;
     }
 }
 void render_scene(const Scene* scene,float speed)
@@ -162,17 +160,16 @@ void render_scene(const Scene* scene,float speed)
     set_material(&(scene->material));
     set_lighting(scene,speed);
     glPushMatrix();
-       glRotatef(Angels+scene->spaceship.rotate,1.0f,0.0f,0.0f);
-       glRotatef(Angels,0.0f,1.0f,0.0f);
-       glTranslatef(scene->spaceship.position.x,scene->spaceship.position.y,scene->spaceship.position.z);
-       glBindTexture(GL_TEXTURE_2D, scene->texture_id[0]);
-       draw_model(&(scene->objects[0]));
+        glTranslatef(scene->spaceship.position.x,scene->spaceship.position.y,scene->spaceship.position.z);
+        glRotatef(scene->spaceship.rotate,1.0f,0.0f,0.0f);
+        glBindTexture(GL_TEXTURE_2D, scene->texture_id[0]);
+        draw_model(&(scene->objects[0]));
     glPopMatrix();   
-    for(int i = 0; i < 10;i++){    
+    for(int i = 0; i < 50;i++){    
         glPushMatrix(); 
             glBindTexture(GL_TEXTURE_2D, scene->texture_id[1]);
-            glRotatef(scene->meteors[i].angle,1.0f,1.0f,0.0f);
             glTranslatef(scene->meteors[i].position.x,scene->meteors[i].position.y,scene->meteors[i].position.z);
+            glRotatef(scene->meteors[i].angle,1.0f,1.0f,0.0f);
             draw_model(&(scene->objects[1]));
         glPopMatrix();
     }

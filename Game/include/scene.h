@@ -12,7 +12,7 @@
 
 #define SIZE 2
 #define T_SIZE 3
-#define N_METEOR 10
+#define N_METEOR 50
 
 typedef struct Scene
 {
