@@ -1,9 +1,11 @@
 #include "app.h"
 
 #include <SDL2/SDL_image.h>
+#include <stdbool.h>
 
 float ang = 0;
 float spaceship_height = 0, side_rl = 0;
+bool follow = true;
 
 void init_app(App* app, int width, int height)
 {
@@ -116,11 +118,25 @@ void handle_app_events(App* app)
             case SDL_SCANCODE_ESCAPE:
                 app->is_running = false;
                 break;
+            case SDL_SCANCODE_C:
+                if(follow == true) follow = false;
+                else follow = true;
+                break;
             case SDL_SCANCODE_I:
-                set_camera_speed(&(app->camera), 1);
+                if(follow == false)
+                    set_camera_speed(&(app->camera), 1);
                 break;
             case SDL_SCANCODE_K:
-                set_camera_speed(&(app->camera), -1);
+                if(follow == false)
+                    set_camera_speed(&(app->camera), -1);
+                break;
+            case SDL_SCANCODE_J:
+                if(follow == false)
+                    set_camera_side_speed(&(app->camera), 1);
+                break;
+            case SDL_SCANCODE_L:
+                if(follow == false)
+                    set_camera_side_speed(&(app->camera), -1);
                 break;
             case SDL_SCANCODE_Q:
                  side_rl = 0.05;
@@ -149,6 +165,10 @@ void handle_app_events(App* app)
             case SDL_SCANCODE_I:
             case SDL_SCANCODE_K:
                 set_camera_speed(&(app->camera), 0);
+                break;
+            case SDL_SCANCODE_J:
+            case SDL_SCANCODE_L:
+                set_camera_side_speed(&(app->camera), 0);
                 break;
             case SDL_SCANCODE_A:
             case SDL_SCANCODE_D:

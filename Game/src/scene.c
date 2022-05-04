@@ -102,6 +102,7 @@ void set_material(const Material* material)
 
 void update_scene(Scene* scene,float ang,float spaceship_height,float side_rl)
 {   
+
     if((scene->spaceship.rotate + ang) <= -45)
 	scene->spaceship.rotate = -45;
     if(((scene->spaceship.rotate + ang) >= 45))
