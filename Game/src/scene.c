@@ -4,18 +4,15 @@
 #include <obj/draw.h>
 #include <time.h>
 #include "meteor.h"
+#include "spaceship.h"
 
 #define Angels 90
 
-float rotate = 0.00;
-float  h_space = 0, r_side_l = 0;
-float speed = 1;					// majd spaceship recordba elhelyezni! vec3-ba
+float  h_space = 0, r_side_l = 0;				
 
 void init_scene(Scene* scene)
 {
-    load_model(&(scene->objects[0]), "assets/models/spaceship.obj");
-    scene->texture_id[0] = load_texture("assets/textures/spaceship.jpg");
-
+    init_spaceship(scene);
     init_meteors(scene);
 
     scene->material.ambient.red = 1.0;
@@ -31,6 +28,18 @@ void init_scene(Scene* scene)
     scene->material.specular.blue = 0.0;
 
     scene->material.shininess = 1.4;
+}
+
+void init_spaceship(Scene* scene){
+
+    load_model(&(scene->objects[0]), "assets/models/spaceship.obj");
+    scene->texture_id[0] = load_texture("assets/textures/spaceship.jpg");
+
+    scene->spaceship.position.x = 0;
+    scene->spaceship.position.y = 0;
+    scene->spaceship.position.z = 1.25;
+    scene->spaceship.rotate = 0.00;
+    scene->spaceship.speed = 0.35;
 }
 
 void init_meteors(Scene* scene){
@@ -93,13 +102,13 @@ void set_material(const Material* material)
 
 void update_scene(Scene* scene,float ang,float spaceship_height,float side_rl)
 {   
-    if((rotate + ang) <= -45)
-	rotate = -45;
-    if(((rotate + ang) >= 45))
-	rotate = 45;    
+    if((scene->spaceship.rotate + ang) <= -45)
+	scene->spaceship.rotate = -45;
+    if(((scene->spaceship.rotate + ang) >= 45))
+	scene->spaceship.rotate = 45;    
 
-    if(((rotate + ang) >= -45) && ((rotate + ang) <= 45))
-	rotate += ang;
+    if(((scene->spaceship.rotate + ang) >= -45) && ((scene->spaceship.rotate + ang) <= 45))
+	scene->spaceship.rotate += ang;
    
 
     if((h_space - spaceship_height) < 10) h_space = h_space + spaceship_height;
@@ -112,7 +121,11 @@ void update_scene(Scene* scene,float ang,float spaceship_height,float side_rl)
         if((scene->meteors[i].angle + 0.05) < 360.00) scene->meteors[i].angle += 0.05;
         else scene->meteors[i].angle = 0.00;
 
-    speed += 0.35;								//spaceship recordba beírni
+    scene->spaceship.position.x = r_side_l;
+    scene->spaceship.position.y = h_space;
+    scene->spaceship.position.z += scene->spaceship.speed;
+
+    scene->spaceship.rotate += ang;
 
     for(int i = 0;i<10;i++){
 	scene->meteors[i].position.y -= 1;
@@ -124,11 +137,9 @@ void render_scene(const Scene* scene)
     set_material(&(scene->material));
     set_lighting();
     glPushMatrix();
-       glRotatef(Angels+rotate,1.0f,0.0f,0.0f);
+       glRotatef(Angels+scene->spaceship.rotate,1.0f,0.0f,0.0f);
        glRotatef(Angels,0.0f,1.0f,0.0f);
-       glTranslatef(0,h_space,0);
-       glTranslatef(r_side_l,0,0);
-       glTranslatef(0,0,speed);
+       glTranslatef(scene->spaceship.position.x,scene->spaceship.position.y,scene->spaceship.position.z);
        glBindTexture(GL_TEXTURE_2D, scene->texture_id[0]);
        draw_model(&(scene->objects[0]));
     glPopMatrix();   

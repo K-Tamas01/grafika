@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "texture.h"
 #include "meteor.h"
+#include "spaceship.h"
 
 #include <obj/model.h>
 
@@ -16,6 +17,7 @@ typedef struct Scene
     Model objects[SIZE];
     Material material;
     Meteors meteors[N_METEOR];
+    Ship spaceship;
     GLuint texture_id[T_SIZE];
 } Scene;
 
@@ -45,6 +47,8 @@ void update_scene(Scene* scene ,float ang,float spaceship_height,float side_rl);
 void render_scene(const Scene* scene);
 
 void init_meteors(Scene* scene);
+
+void init_spaceship(Scene* scene);
 
 void update_rotation(Scene* scene);
 
