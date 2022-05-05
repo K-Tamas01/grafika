@@ -44,7 +44,8 @@ void init_spaceship(Scene* scene){
     scene->spaceship.position.y = 0;
     scene->spaceship.position.z = 1.25;
     scene->spaceship.rotate = 0.00;
-    scene->spaceship.speed = 0.15;
+    scene->spaceship.bumb = false;
+    scene->spaceship.speed = 0.35;
 }
 
 void init_meteors(Scene* scene){
@@ -57,11 +58,15 @@ void init_meteors(Scene* scene){
     for(int i = 0;i<50;i++){
         coord = (rand() % 90) + 20;
         scene->meteors[i].position.x = coord;
-        coord = (rand() % 70) + 20;
+        coord = (rand() % 140) - 70;
         scene->meteors[i].position.y = coord;
         coord = (rand() % 90) + 20;
         scene->meteors[i].position.z = coord;
         scene->meteors[i].angle = 0.00;
+        if(scene->meteors[i].position.y > 0)
+            scene->meteors[i].is_plus = true;
+        else
+            scene->meteors[i].is_plus = false;
     }
 }
 
@@ -141,7 +146,8 @@ void update_scene(Scene* scene,float ang,float spaceship_height,float side_rl)
     if((r_side_l + side_rl) > 10) r_side_l = r_side_l - side_rl;
 
     for(int i = 0;i<50;i++)
-        if((scene->meteors[i].angle + 2.5) < 360.00) scene->meteors[i].angle += 2.5;
+        if((scene->meteors[i].angle + 2.5 ) < 360.00 && scene->meteors[i].is_plus == true) scene->meteors[i].angle += 2.5;
+        else if((scene->meteors[i].angle - 2.5 > -360.00) && scene->meteors[i].is_plus == false) scene->meteors[i].angle -= 2.5;
         else scene->meteors[i].angle = 0.00;
 
     scene->spaceship.position.x += scene->spaceship.speed;
@@ -150,9 +156,14 @@ void update_scene(Scene* scene,float ang,float spaceship_height,float side_rl)
 
     scene->spaceship.rotate += ang;
 
+    collision_detection(scene);
+
     for(int i = 0;i<50;i++){
-	    scene->meteors[i].position.y -= 0.15;
-	    scene->meteors[i].position.z -= 0.15;
+	    if(scene->meteors[i].is_plus)
+            scene->meteors[i].position.y -= 0.125;
+        else
+            scene->meteors[i].position.y += 0.125;
+	    scene->meteors[i].position.z -= 0.125;
     }
 }
 void render_scene(const Scene* scene,float speed)
@@ -211,4 +222,21 @@ void help(const GLuint texture){
     glEnable(GL_LIGHTING);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
+}
+
+void collision_detection(Scene* scene){
+    //spaceship vs meteor
+
+
+    //meteor vs meteor
+
+    for(int i = 0;i<49;i++)
+        for(int j = i+1;j<50;j++){
+                if((scene->meteors[i].position.x == scene->meteors[j].position.x &&
+                (scene->meteors[i].position.y - 1.25)  == (scene->meteors[j].position.y + 1.25) &&
+                (scene->meteors[i].position.z) == (scene->meteors[j].position.z))){
+                    scene->meteors[i].is_plus = false;
+                    scene->meteors[j].is_plus = true;
+                }
+            }
 }

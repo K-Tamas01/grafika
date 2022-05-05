@@ -6,9 +6,12 @@
 #include "utils.h"
 #include "scene.h"
 
+#include <stdbool.h>
+
 typedef struct Meteors{
     vec3 position;
     float angle;
+    bool is_plus;
 }Meteors;
 
 #endif

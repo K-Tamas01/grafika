@@ -233,6 +233,11 @@ void update_app(App* app)
     elapsed_time = current_time - app->uptime;
     app->uptime = current_time;
 
+    if(follow == true){ 
+        app->camera.position.x = app->scene.spaceship.position.x - 5;
+        app->camera.position.y = app->scene.spaceship.position.y;
+        app->camera.position.z = app->scene.spaceship.position.z + 1;
+    }
     update_camera(&(app->camera), elapsed_time);
     update_scene(&(app->scene), ang, spaceship_height,side_rl);
 }
