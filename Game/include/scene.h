@@ -11,7 +11,7 @@
 #include <obj/model.h>
 
 #define SIZE 2
-#define T_SIZE 3
+#define T_SIZE 4
 #define N_METEOR 50
 
 typedef struct Scene
@@ -59,5 +59,7 @@ void update_rotation(Scene* scene);
 void help(const GLuint texture);
 
 void init_light(Scene* scene);
+
+void game_over(const GLuint texture);
 
 #endif /* SCENE_H */

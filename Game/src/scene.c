@@ -17,6 +17,7 @@ void init_scene(Scene* scene)
     init_meteors(scene);
 
     scene->texture_id[2] = load_texture("assets/textures/help.jpg");
+    scene->texture_id[3] = load_texture("assets/textures/gameover.jpg");
 
     scene->is_visible = false;
 
@@ -42,10 +43,10 @@ void init_spaceship(Scene* scene){
 
     scene->spaceship.position.x = 0;
     scene->spaceship.position.y = 0;
-    scene->spaceship.position.z = 1.25;
+    scene->spaceship.position.z = 0;
     scene->spaceship.rotate = 0.00;
     scene->spaceship.bumb = false;
-    scene->spaceship.speed = 0.35;
+    scene->spaceship.speed = 0.2;
 }
 
 void init_meteors(Scene* scene){
@@ -129,41 +130,42 @@ void set_material(const Material* material)
 }
 
 void update_scene(Scene* scene,float ang,float spaceship_height,float side_rl)
-{   
-    if((scene->spaceship.rotate + ang) <= -45)
-	    scene->spaceship.rotate = -45;
-    if(((scene->spaceship.rotate + ang) >= 45))
-	    scene->spaceship.rotate = 45;    
+{   if(scene->spaceship.bumb == false){
+        if((scene->spaceship.rotate + ang) <= -45)
+	        scene->spaceship.rotate = -45;
+        if(((scene->spaceship.rotate + ang) >= 45))
+	        scene->spaceship.rotate = 45;    
 
-    if(((scene->spaceship.rotate + ang) >= -45) && ((scene->spaceship.rotate + ang) <= 45))
-	    scene->spaceship.rotate += ang;
+        if(((scene->spaceship.rotate + ang) >= -45) && ((scene->spaceship.rotate + ang) <= 45))
+	        scene->spaceship.rotate += ang;
    
 
-    if((h_space - spaceship_height) < 10) h_space = h_space + spaceship_height;
-    if((h_space + spaceship_height) > 10) h_space = h_space - spaceship_height;
+        if((h_space - spaceship_height) < 10) h_space = h_space + spaceship_height;
+        if((h_space + spaceship_height) > 10) h_space = h_space - spaceship_height;
 
-    if((r_side_l - side_rl) < 10) r_side_l = r_side_l + side_rl;
-    if((r_side_l + side_rl) > 10) r_side_l = r_side_l - side_rl;
+        if((r_side_l - side_rl) < 10) r_side_l = r_side_l + side_rl;
+        if((r_side_l + side_rl) > 10) r_side_l = r_side_l - side_rl;
 
-    for(int i = 0;i<50;i++)
-        if((scene->meteors[i].angle + 2.5 ) < 360.00 && scene->meteors[i].is_plus == true) scene->meteors[i].angle += 2.5;
-        else if((scene->meteors[i].angle - 2.5 > -360.00) && scene->meteors[i].is_plus == false) scene->meteors[i].angle -= 2.5;
-        else scene->meteors[i].angle = 0.00;
+        for(int i = 0;i<50;i++)
+            if((scene->meteors[i].angle + 2.5 ) < 360.00 && scene->meteors[i].is_plus == true) scene->meteors[i].angle += 2.5;
+            else if((scene->meteors[i].angle - 2.5 > -360.00) && scene->meteors[i].is_plus == false) scene->meteors[i].angle -= 2.5;
+            else scene->meteors[i].angle = 0.00;
 
-    scene->spaceship.position.x += scene->spaceship.speed;
-    scene->spaceship.position.y = r_side_l;
-    scene->spaceship.position.z = h_space;
+        scene->spaceship.position.x += scene->spaceship.speed;
+        scene->spaceship.position.y = r_side_l;
+        scene->spaceship.position.z = h_space;
 
-    scene->spaceship.rotate += ang;
+        scene->spaceship.rotate += ang;
 
-    collision_detection(scene);
+        collision_detection(scene);
 
-    for(int i = 0;i<50;i++){
-	    if(scene->meteors[i].is_plus)
-            scene->meteors[i].position.y -= 0.125;
-        else
-            scene->meteors[i].position.y += 0.125;
-	    scene->meteors[i].position.z -= 0.125;
+        for(int i = 0;i<49;i++){
+	        if(scene->meteors[i].is_plus)
+                scene->meteors[i].position.y -= 0.125;
+            else
+                scene->meteors[i].position.y += 0.125;
+	        scene->meteors[i].position.z -= 0.125;
+        }
     }
 }
 void render_scene(const Scene* scene,float speed)
@@ -184,9 +186,11 @@ void render_scene(const Scene* scene,float speed)
             draw_model(&(scene->objects[1]));
         glPopMatrix();
     }
-    if(scene->is_visible){
+    if(scene->is_visible)
         help(scene->texture_id[2]);
-    }
+
+    if(scene->spaceship.bumb == true)
+        game_over(scene->texture_id[3]);
 
 }
 
@@ -226,17 +230,52 @@ void help(const GLuint texture){
 
 void collision_detection(Scene* scene){
     //spaceship vs meteor
-
+    for(int i = 0;i<50;i++)
+        if(scene->spaceship.position.x >= scene->meteors[i].position.x && (scene->spaceship.position.y >= (scene->meteors[i].position.y - 1.25) && scene->meteors[i].is_plus == true || scene->spaceship.position.y >= (scene->meteors[i].position.y + 1.25) && scene->meteors[i].is_plus == false) && scene->spaceship.position.z >= (scene->meteors[i].position.z - 1.25))
+            scene->spaceship.bumb = true;
 
     //meteor vs meteor
-
     for(int i = 0;i<49;i++)
         for(int j = i+1;j<50;j++){
                 if((scene->meteors[i].position.x == scene->meteors[j].position.x &&
-                (scene->meteors[i].position.y - 1.25)  == (scene->meteors[j].position.y + 1.25) &&
+                (scene->meteors[i].position.y - 1.25) == (scene->meteors[j].position.y + 1.25) &&
                 (scene->meteors[i].position.z) == (scene->meteors[j].position.z))){
                     scene->meteors[i].is_plus = false;
                     scene->meteors[j].is_plus = true;
                 }
             }
+}
+
+void game_over(const GLuint texture){
+
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_COLOR_MATERIAL);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    glColor4f(0.75f, 0.75f, 0.75f, 1.0f);
+
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glBegin(GL_QUADS);
+        glTexCoord2f(0, 0);
+        glVertex3d(-2, 1.5, -3);
+
+        glTexCoord2f(1, 0);
+        glVertex3d(2, 1.5, -3);
+
+        glTexCoord2f(1, 1);
+        glVertex3d(2, -1.5, -3);
+        
+        glTexCoord2f(0, 1);
+        glVertex3d(-2, -1.5, -3);
+    glEnd();
+
+    glDisable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 }
