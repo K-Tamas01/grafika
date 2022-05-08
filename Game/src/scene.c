@@ -159,7 +159,7 @@ void update_scene(Scene* scene,float ang,float spaceship_height,float side_rl)
 
         collision_detection(scene);
 
-        for(int i = 0;i<49;i++){
+        for(int i = 0;i<50;i++){
 	        if(scene->meteors[i].is_plus)
                 scene->meteors[i].position.y -= 0.125;
             else
@@ -231,14 +231,17 @@ void help(const GLuint texture){
 void collision_detection(Scene* scene){
     //spaceship vs meteor
     for(int i = 0;i<50;i++)
-        if(scene->spaceship.position.x >= scene->meteors[i].position.x && (scene->spaceship.position.y >= (scene->meteors[i].position.y - 1.25) && scene->meteors[i].is_plus == true || scene->spaceship.position.y >= (scene->meteors[i].position.y + 1.25) && scene->meteors[i].is_plus == false) && scene->spaceship.position.z >= (scene->meteors[i].position.z - 1.25))
+        if(((scene->spaceship.position.x + 1) >= scene->meteors[i].position.x && (scene->spaceship.position.x - 2) <= scene->meteors[i].position.x) && 
+           ((scene->spaceship.position.y + 2) >= scene->meteors[i].position.y && (scene->spaceship.position.y - 2) <= scene->meteors[i].position.y) && 
+           ((scene->spaceship.position.z + 1) >= scene->meteors[i].position.z && (scene->spaceship.position.z - 2) <= scene->meteors[i].position.z))
             scene->spaceship.bumb = true;
 
     //meteor vs meteor
     for(int i = 0;i<49;i++)
         for(int j = i+1;j<50;j++){
                 if((scene->meteors[i].position.x == scene->meteors[j].position.x &&
-                (scene->meteors[i].position.y - 1.25) == (scene->meteors[j].position.y + 1.25) &&
+                ((scene->meteors[i].position.y - 1.25) == (scene->meteors[j].position.y + 1.25) ||
+                 (scene->meteors[i].position.y + 1.25) == (scene->meteors[j].position.y - 1.25)) &&
                 (scene->meteors[i].position.z) == (scene->meteors[j].position.z))){
                     scene->meteors[i].is_plus = false;
                     scene->meteors[j].is_plus = true;
